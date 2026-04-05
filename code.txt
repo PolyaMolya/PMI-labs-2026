@@ -1,0 +1,190 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+struct x_n {
+    int n;
+    float* x;
+    float* sum;
+    float* err;
+};
+
+void iniz(x_n& main) {
+    main.sum = (float*)malloc(main.n * sizeof(float));
+    main.err = (float*)malloc(main.n * sizeof(float));
+    main.x = (float*)malloc(main.n * sizeof(float));
+    for (int i = 0; i < main.n; i++) {
+        main.x[i] = 0.0f;
+        main.sum[i] = 0.0f;
+        main.err[i] = 0.0f;
+    }
+}
+
+void fill_sin(x_n& main, float x_) {
+    main.x[0] = x_;
+    for (int n = 0; n < main.n - 1; n++) {
+        main.x[n + 1] = (-x_ * x_) / ((2 * n + 2) * (2 * n + 3)) * main.x[n];
+    }
+}
+
+void fill_cos(x_n& main, float x_) {
+    main.x[0] = 1.0f;
+    for (int n = 0; n < main.n - 1; n++) {
+        main.x[n + 1] = (-x_ * x_) / ((2 * n + 1) * (2 * n + 2)) * main.x[n];
+    }
+}
+
+void fill_exp(x_n& main, float x_) {
+    main.x[0] = 1.0f;
+    for (int n = 0; n < main.n - 1; n++) {
+        main.x[n + 1] = (x_ / (n + 1)) * main.x[n];
+    }
+}
+
+void fill_ln(x_n& main, float x_) {
+    main.x[0] = x_ - 1.0f;
+    for (int n = 1; n < main.n; n++) {
+        main.x[n] = -main.x[n - 1] * (x_ - 1.0f) * n / (n + 1);
+    }
+}
+
+void sum_left(x_n& main) {
+    main.sum[0] = main.x[0];
+    for (int k = 1; k < main.n; k++) {
+        main.sum[k] = main.x[k] + main.sum[k - 1];
+    }
+}
+
+void sum_right(x_n& main) {
+    if (main.n > 0) {
+        main.sum[main.n - 1] = main.x[main.n - 1];
+        for (int k = main.n - 2; k >= 0; k--) {
+            main.sum[k] = main.x[k] + main.sum[k + 1];
+        }
+    }
+}
+
+void err_left(x_n& main, float vvod, float (*func)(float)) {
+    for (int j = 0; j < main.n; j++) {
+        main.err[j] = fabs(main.sum[j] - func(vvod));
+    }
+}
+
+void err_right(x_n& main, float vvod, float (*func)(float)) {
+    for (int j = 0; j < main.n; j++) {
+        main.err[j] = fabs(main.sum[j] - func(vvod));
+    }
+}
+
+float sin_float(float x) {
+    return (float)sin(x);
+}
+
+float cos_float(float x) {
+    return (float)cos(x);
+}
+
+float exp_float(float x) {
+    return (float)exp(x);
+}
+
+float ln_float(float x) {
+    return (float)log(x);
+}
+
+int main() {
+    float x;
+    int n;
+    int choice;
+
+    printf("chose:\n");
+    printf("1 - sin(x)\n");
+    printf("2 - cos(x)\n");
+    printf("3 - exp(x)\n");
+    printf("4 - ln(1+x)\n");
+    scanf_s("%d", &choice);
+    printf("ins x and n: ");
+    scanf_s("%f %d", &x, &n);
+    x_n main;
+    main.n = n;
+    iniz(main);
+    if (choice == 1) {
+        fill_sin(main, x);
+        printf("\nsin(x)\n");
+    }
+    else if (choice == 2) {
+        fill_cos(main, x);
+        printf("\ncos(x)\n");
+    }
+    else if (choice == 3) {
+        fill_exp(main, x);
+        printf("\nexp(x)\n");
+    }
+    else if (choice == 4) {
+        if (x <= -1.0f || x > 1.0f) {
+            printf("ERROR\n");
+            free(main.x);
+            free(main.sum);
+            free(main.err);
+            return 1;
+        }
+        fill_ln(main, x);
+        printf("\nln(1+x)\n");
+    }
+    else {
+        printf("ERROR\n");
+        free(main.x);
+        free(main.sum);
+        free(main.err);
+        return 1;
+    }
+    printf("\n(sum_left)\n");
+    if (choice == 1) {
+        sum_left(main);
+        err_left(main, x, sin_float);
+    }
+    else if (choice == 2) {
+        sum_left(main);
+        err_left(main, x, cos_float);
+    }
+    else if (choice == 3) {
+        sum_left(main);
+        err_left(main, x, exp_float);
+    }
+    else if (choice == 4) {
+        sum_left(main);
+        err_left(main, x, ln_float);
+    }
+
+    for (int q = 0; q < n; q++) {
+        printf("%d %f %f\n", q, main.sum[q], main.err[q]);
+    }
+
+    printf("\n(sum_right)\n");
+    if (choice == 1) {
+        sum_right(main);
+        err_right(main, x, sin_float);
+    }
+    else if (choice == 2) {
+        sum_right(main);
+        err_right(main, x, cos_float);
+    }
+    else if (choice == 3) {
+        sum_right(main);
+        err_right(main, x, exp_float);
+    }
+    else if (choice == 4) {
+        sum_right(main);
+        err_right(main, x, ln_float);
+    }
+
+    for (int q = 0; q < n; q++) {
+        printf("%d %f %f\n", q, main.sum[q], main.err[q]);
+    }
+
+    free(main.x);
+    free(main.sum);
+    free(main.err);
+
+    return 0;
+}
