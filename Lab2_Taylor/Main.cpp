@@ -5,9 +5,13 @@
 using namespace std;
 int main() {
 	struct Xn d;
-	int n = 10;
-	float x = 0.707f;
-	
+	int n;
+	float x;
+	cout << "Enter the number of terms and the walue of X " << endl;
+	cout << "N = ";
+	cin >> n;
+	cout << "X = ";
+	cin >> x;
 	const char* Myfile = "lab.results.csv";
 	prepare_csv(Myfile);
 

@@ -18,8 +18,11 @@ void int_struct(struct Xn* xn, int n)
 void free_struct(struct Xn* xn, int n)
 {
 	free(xn->x);
+	xn->x = NULL;
 	free(xn->err);
+	xn->err = NULL;
 	free(xn->sum);
+	xn->sum = NULL;
 }
 enum TaylorMode{SIN, COS, LN, EXP};
 void static universal(Xn* xn, float x, TaylorMode mode);
