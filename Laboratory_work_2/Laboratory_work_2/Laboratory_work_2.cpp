@@ -272,12 +272,13 @@ int main()
 		}
 	}
 	m.print();
-	std::cout << "enter the rigth part of sistem\n";
-	My_vector<double> v(n, 1);
-	for (int i = 0; i < n; i++) {
-		std::cin >> v[i];
-	}
+	
 	while (true) {
+		std::cout << "enter the rigth part of sistem\n";
+		My_vector<double> v(n, 1);
+		for (int i = 0; i < n; i++) {
+			std::cin >> v[i];
+		}
 		SLAU <double> copy_m = m;  
 		std::cout << "choose the method: 1 - Gauss, 2 - Jordan-Gauss, 3 - exit";
 		int choose; std::cin >> choose;
