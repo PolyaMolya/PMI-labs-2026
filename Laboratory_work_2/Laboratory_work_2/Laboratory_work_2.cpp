@@ -1,10 +1,3 @@
-// Laboratory_work_2.cpp : This file contains the 'main' function. Program execution begins and ends there.
-
-
-
-
-
-
 #include <iostream>
 
 template <typename T>
@@ -148,28 +141,29 @@ public:
 	~SLAU() {};
 
 	My_vector<T> Gauss(My_vector<T> a) {
-		if (this->size == 0)
+		SLAU <T> m = *this;   //copy of matrix
+		if (m.size == 0)
 			throw "error: Matrix`s size = 0";
 
 		My_vector<T> answer = a; //копия правой части
 
 		//к ступенчатосму виду
-		for (int i = 0; i < this->size; i++) {
-			if (this->arr[i][i] == 0) { //если на главной диагонали стоит 0, то меняем строки местами
+		for (int i = 0; i < m.size; i++) {
+			if (m.arr[i][i] == 0) { //если на главной диагонали стоит 0, то меняем строки местами
 				int j = i + 1;
-				while (j < this->size && this->arr[j][i] == 0) {
+				while (j < m.size && m.arr[j][i] == 0) {
 					j++;
 				}
-				if (j == this->size) {
+				if (j == m.size) {
 					throw "error: no solutions or infinite number of solutions";
 				}
-				this->swap(i, j);
+				m.swap(i, j);
 				answer.swap(i, j);
 			}
-			for (int j = i + 1; j < this->size; j++) {
-				T k = this->arr[j][i] / this->arr[i][i];  
-				for (int h = 0; h < this->size; h++) {
-					this->arr[j][h] -= k * this->arr[i][h];  //вычитаем из строки j строку i, умноженную на k
+			for (int j = i + 1; j < m.size; j++) {
+				T k = m.arr[j][i] / m.arr[i][i];  
+				for (int h = 0; h < m.size; h++) {
+					m.arr[j][h] -= k * m.arr[i][h];  //вычитаем из строки j строку i, умноженную на k
 				}
 				answer[j] -= k * answer[i];
 			}
@@ -177,12 +171,12 @@ public:
 		
 		//матрица в ступенчатои виде
 
-		answer[this->size - 1] = answer[this->size - 1] / this->arr[this->size - 1][this->size - 1];  //xn
-		for (int j = this->size - 2; j >= 0; j--) {  //xi  пор строкам вверх
-			for (int i = this->size - 1; i > j; i--) { //по столбцам влево
-				answer[j] -= this->arr[j][i] * answer[i];
+		answer[m.size - 1] = answer[m.size - 1] / m.arr[m.size - 1][m.size - 1];  //xn
+		for (int j = m.size - 2; j >= 0; j--) {  //xi  пор строкам вверх
+			for (int i = m.size - 1; i > j; i--) { //по столбцам влево
+				answer[j] -= m.arr[j][i] * answer[i];
 			}
-			answer[j] = answer[j] / this->arr[j][j];
+			answer[j] = answer[j] / m.arr[j][j];
 			
 		}
 		//
@@ -193,19 +187,20 @@ public:
 
 
 	My_vector<T> Jordan_Gauss(My_vector<T> a) {
-		if (this->size == 0)
+		SLAU <T> m = *this;   //copy of matrix
+		if (m.size == 0)
 			throw "error: Matrix`s size = 0";
 
 		My_vector<T> answer = a; //копия правой части
 
 
-		for (int i = 0; i < this->size; i++) {                //проход по столбцам, ведущий элемент
+		for (int i = 0; i < m.size; i++) {                //проход по столбцам, ведущий элемент
 			//ведущий элеемент arr[i][i]
 			//проверка на единственность решения
-			for (int i = 0; i < this->size; i++) {
+			for (int i = 0; i < m.size; i++) {
 				bool f = 0;
-				for (int j = 0; j < this->size; j++) {
-					if (this->arr[i][j] != 0) {
+				for (int j = 0; j < m.size; j++) {
+					if (m.arr[i][j] != 0) {
 						f = 1;
 						break;
 					}
@@ -215,24 +210,24 @@ public:
 					throw "infinitely many solutions";
 				}
 			}
-			if (this->arr[i][i] == 0) {   //если ведущий элемент ноль, то меняем строки местами
-				for (int l = 0; l < this->size - 1; i++) {
-					if (this->arr[l][i] != 0) {
-						this->swap(i, l);
+			if (m.arr[i][i] == 0) {   //если ведущий элемент ноль, то меняем строки местами
+				for (int l = 0; l < m.size - 1; i++) {
+					if (m.arr[l][i] != 0) {
+						m.swap(i, l);
 						answer.swap(i, l);
 						i--; //чтобы после цикла i увеличился на единицу и мы не пропустили строку, которая стала i-й
 						break;
 					}
 				}
 			}
-			for (int j = 0; j < this->size; j++) {
+			for (int j = 0; j < m.size; j++) {
 
 				if (i != j) {
 
-					double k = this->arr[j][i] / this->arr[i][i];
+					double k = m.arr[j][i] / m.arr[i][i];
 					//вычитаем
-					for (int h = 0; h < this->size; h++) {
-						this->arr[j][h] -= k * this->arr[i][h];
+					for (int h = 0; h < m.size; h++) {
+						m.arr[j][h] -= k * m.arr[i][h];
 					}
 					answer[j] -= k * answer[i];
 					//вычли 
@@ -243,11 +238,11 @@ public:
 		
 		//получили матрицу где все эл-ты кроме главной диагонали нули
 
-		for (int i = 0; i < this->size; i++) {
-			for (int j = 0; j < this->size; j++) {
+		for (int i = 0; i < m.size; i++) {
+			for (int j = 0; j < m.size; j++) {
 				if (i == j) {
-					answer[j] = answer[j] / this->arr[i][i];
-					this->arr[i][i] = 1;
+					answer[j] = answer[j] / m.arr[i][i];
+					m.arr[i][i] = 1;
 				}
 			}
 		}
@@ -279,12 +274,12 @@ int main()
 		for (int i = 0; i < n; i++) {
 			std::cin >> v[i];
 		}
-		SLAU <double> copy_m = m;  
+		//SLAU <double> copy_m = m;  
 		std::cout << "choose the method: 1 - Gauss, 2 - Jordan-Gauss, 3 - exit";
 		int choose; std::cin >> choose;
 		if (choose == 1) {
 			try {
-				My_vector<double> ans = copy_m.Gauss(v);
+				My_vector<double> ans = m.Gauss(v);
 				std::cout << "answer: ";
 				ans.print();
 			}
@@ -294,7 +289,7 @@ int main()
 		}
 		else if (choose == 2) {
 			try {
-				My_vector<double> ans = copy_m.Jordan_Gauss(v);
+				My_vector<double> ans = m.Jordan_Gauss(v);
 				std::cout << "answer: ";
 				ans.print();
 			}
@@ -312,6 +307,7 @@ int main()
 	
 	
 }
+
 
 
 
