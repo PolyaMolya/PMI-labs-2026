@@ -11,21 +11,27 @@ public:
 		size = 0;
 		vec = nullptr;
 	}
-	Vector(int _size, T value = T()) {
-		size = _size;
-		vec = new T[size];
-		for (int i = 0; i < size; i++) {
-			vec[i] = value;
+	Vector(unsigned int _size, T value = T()) {
+		if (_size == 0) {
+			size = 0;
+			vec = nullptr;
+		}
+		else {
+			size = _size;
+			vec = new T[size];
+			for (int i = 0; i < size; i++) {
+				vec[i] = value;
+			}
 		}
 	}
-	Vector(const Vector& copy) { //Конструктор копирвоания
+	Vector(const Vector& copy) { 
 		size = copy.size;
 		vec = new T[size];
 		for (int i = 0; i < size; i++) {
 			vec[i] = copy.vec[i];
 		}
 	}
-	Vector& operator=(const Vector& rhs) { //Оператор присваивания
+	Vector& operator=(const Vector& rhs) {
 		if (this != &rhs) {
 			delete[] vec;
 			size = rhs.size;
@@ -36,10 +42,18 @@ public:
 		}
 		return *this;
 	}
-	const T& operator[]( int index) const { // Перегрузка оператора [], чтобы использовать запис v[i], где v - Vector<T>
+	const T& operator[]( int index) const {
+		if (index < 0 || index >= size) {
+			std::cout << "Ошибка! Выход за границы вектора" << "\n";
+			return vec[0];
+		}
 		return vec[index];
 	}
 	T& operator[](int index) {
+		if (index < 0 || index >= size) {
+			std::cout << "Ошибка! Выход за границы вектора" << "\n";
+			return vec[0];
+		}
 		return vec[index];
 	}
 	void PrintVector() {

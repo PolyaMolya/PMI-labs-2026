@@ -23,17 +23,29 @@ int main()
     sys.PrintMatrix();
     printf("\n");
 
-    Vector<double> b(n);
-    std::cout << "Введите вектор b (" << n << " элементa/ов):" << "\n";
-    b.FillVector();
-    printf("\n");
-    b.PrintVector2();
+    int k;
+    std::cout << "Введите количество правых частей"<<"\n";
+    std::cin >> k;
+    if (k <= 0) {
+        std::cout << "Количество должно быть положительным.\n";
+        return 0;
+    }
+
     printf("\n");
 
-    Vector<double> x = sys.Gauss(b);
+    for (int t = 0; t < k; t++) {
+        Vector<double> b(n);
+        std::cout << "Введите вектор b" << t + 1 << " (" << n << " элементa/ов):"<<"\n";
+        b.FillVector();
 
-    if (x.GetSize() != 0) {
-        std::cout << "Ответ:" << "\n";
+        Vector<double> x = sys.Gauss(b);
+
+        if (x.GetSize() == 0) {
+            std::cout << "Для вектора b" << t + 1 << " решение не найдено.\n\n";
+            continue;
+        }
+
+        std::cout << "Решение " << t + 1 << ":\n";
         x.PrintVector2();
         printf("\n");
     }

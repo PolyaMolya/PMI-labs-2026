@@ -11,13 +11,13 @@ public:
 	}
 	void PrintMatrix() {
 		for (int i = 0; i < this->size; i++) {
-			this->vec[i].PrintVector();// вызывов PrintVector для каждой строки
+			this->vec[i].PrintVector();
 			std::cout << "\n";
 		}
 	}
 	void FillMatrix() {
 		for (int i = 0; i < this->size; i++) {
-			this->vec[i].FillVector();// вызов FillVector Для каждой строки
+			this->vec[i].FillVector();
 		}
 	}
 
