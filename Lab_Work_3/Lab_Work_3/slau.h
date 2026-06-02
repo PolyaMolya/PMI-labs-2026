@@ -1,12 +1,12 @@
 #include <iostream>
 #include <math.h>
+#include <exception>
 
 using namespace std;
 
-// свой класс вектор
 template<typename T>
 class Vector {
-private:
+protected:
     T* data;
     int len;
 
@@ -42,11 +42,19 @@ public:
         return len;
     }
 
-    T& operator[](int i) {
-        return data[i];
+    T& operator[](int index) {
+        if (index >= len) {
+            cout << "Oshibka: index " << index << " vne diapazona (razmer " << len << ")" << endl;
+            return data[0];
+        }
+        return data[index];
     }
 
     const T& operator[](int i) const {
+        if (i >= len) {
+            cout << "Oshibka: index " << i << " vne diapazona (razmer " << len << ")" << endl;
+            return data[0];
+        }
         return data[i];
     }
 
@@ -61,33 +69,35 @@ public:
     }
 };
 
-// класс матрица
+//  class matrix
 template<typename T>
-class Matrix {
+class Matrix: public Vector<Vector<T>>{
 protected:
-    Vector<Vector<T>> data;
     int size_n;
-
 public:
-    Matrix(int n = 0) : size_n(n) {
-        if (n < 0) n = 0;
-        data = Vector<Vector<T>>(n);
-        for (int i = 0; i < n; i++) {
-            Vector<T> row(n);
-            data[i] = row;
+    Matrix(int n = 0) : Vector<Vector<T>>(n), size_n(n) {
+        if (n < 0) {
+            size_n = 0;
+            Vector<Vector<T>>::Vector(0); 
+        }
+        for (int i = 0; i < size_n; i++) {
+            Vector<T> row(size_n);
+            Vector<Vector<T>>::operator[](i) = row;
         }
     }
+
+    Matrix(const Matrix& other) : Vector<Vector<T>>(other), size_n(other.size_n) {}
 
     int razmer() const {
         return size_n;
     }
 
-    Vector<T>& operator[](int i) {
-        return data[i];
-    }
-
-    const Vector<T>& operator[](int i) const {
-        return data[i];
+    Vector<T>& operator[](int index) {
+        if (index >= size_n) {
+            cout << "Oshibka: index " << index << " vne diapazona (razmer " << size_n << ")" << endl;
+            return Vector<Vector<T>>::operator[](0);
+        }
+        return Vector<Vector<T>>::operator[](index);
     }
 
     void swapRows(int row1, int row2) {
@@ -97,7 +107,7 @@ public:
     }
 };
 
-// класс слау
+
 template<typename T>
 class SLAU : public Matrix<T> {
 public:
@@ -106,13 +116,12 @@ public:
     Vector<T> gauss_jordan(Vector<T> pravo) {
         int n = this->razmer();
 
-        // защита от нулевого размера
+
         if (n == 0) {
             cout << "Ошибка: матрица нулевого размера\n";
             return Vector<T>(0);
         }
 
-        // создаем копию матрицы
         Matrix<T> a(n);
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
@@ -121,20 +130,20 @@ public:
         Vector<T> b = pravo;
 
         for (int k = 0; k < n; k++) {
-            // поиск главного элемента
+
             int glavnaya = k;
             for (int i = k + 1; i < n; i++) {
                 if (abs(a[i][k]) > abs(a[glavnaya][k]))
                     glavnaya = i;
             }
 
-            // проверка на вырожденность
+
             if (abs(a[glavnaya][k]) < 1e-10) {
                 cout << "Ошибка: матрица вырождена или система не имеет единственного решения\n";
                 return Vector<T>(n);
             }
 
-            // перестановка строк
+
             if (glavnaya != k) {
                 for (int j = 0; j < n; j++) {
                     T temp = a[k][j];
@@ -146,7 +155,7 @@ public:
                 b[glavnaya] = temp;
             }
 
-            // деление строки на ведущий элемент
+
             T ved = a[k][k];
             if (abs(ved) < 1e-10) {
                 cout << "Ошибка: нулевой ведущий элемент\n";
@@ -157,7 +166,7 @@ public:
                 a[k][j] = a[k][j] / ved;
             b[k] = b[k] / ved;
 
-            // обнуление остальных строк
+
             for (int i = 0; i < n; i++) {
                 if (i != k) {
                     T mn = a[i][k];

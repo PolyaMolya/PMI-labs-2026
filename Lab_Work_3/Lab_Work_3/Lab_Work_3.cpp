@@ -7,48 +7,70 @@ int main() {
 
     do {
         int n;
-        cout << "Введите размер матрицы: ";
+        cout << "Vvedite razmer matricy: ";
         cin >> n;
 
         if (n <= 0) {
-            cout << "Ошибка: размер матрицы должен быть положительным\n";
+            cout << "Oshibka: razmer matricy dolzhen byt polozhitelnym\n";
             continue;
         }
 
         SLAU<double> slau(n);
 
-        cout << "Введите матрицу А:\n";
+        cout << "Vvedite matricu A:\n";
         for (int i = 0; i < n; i++) {
-            cout << "Строка " << i + 1 << " (через пробел): ";
+            cout << "Stroka " << i + 1 << " (cherez probel): ";
             for (int j = 0; j < n; j++) {
                 cin >> slau[i][j];
             }
         }
 
         Vector<double> b(n);
-        cout << "Введите вектор правой части b (через пробел):";
+        cout << "Vvedite vector pravoy chasti b (cherez probel): ";
         for (int i = 0; i < n; i++) {
             cin >> b[i];
         }
 
         Vector<double> x = slau.gauss_jordan(b);
 
-        cout << "\nРешение:\n";
+        cout << "\nReshenie:\n";
         for (int i = 0; i < n; i++) {
             cout << "x" << i + 1 << " = " << x[i] << "\n";
         }
 
-        cout << "1) Решить новую матрицу\n";
-        cout << "2) Выйти из программы\n";
+        cout << "\nHotite reshit s drugim vektorom? (1-da, 2-net): ";
+        int reuse;
+        cin >> reuse;
+
+        while (reuse == 1) {
+            Vector<double> b1(n);
+            cout << "Vvedite drugoy vector b (cherez probel): ";
+            for (int i = 0; i < n; i++) {
+                cin >> b1[i];
+            }
+
+            Vector<double> x1 = slau.gauss_jordan(b1);
+
+            cout << "\nReshenie:\n";
+            for (int i = 0; i < n; i++) {
+                cout << "x" << i + 1 << " = " << x1[i] << "\n";
+            }
+
+            cout << "\nHotite reshit s drugim vektorom? (1-da, 2-net): ";
+            cin >> reuse;
+        }
+
+        cout << "\n1) Reshit novuyu matricu\n";
+        cout << "2) Vyyty iz programmy\n";
         cin >> choice;
 
         while (choice != 1 && choice != 2) {
-            cout << "Ошибка! Введите 1 или 2: ";
+            cout << "Oshibka! Vvedite 1 ili 2: ";
             cin >> choice;
         }
 
         if (choice == 2) {
-            cout << "\nПрограмма завершена\n";
+            cout << "\nProgramma zavershena\n";
         }
 
     } while (choice != 2);
