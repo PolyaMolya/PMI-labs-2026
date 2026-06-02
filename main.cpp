@@ -14,13 +14,34 @@ int main() {
             cin >> matrix[i][j];
         }
     }
-    cout << "Vvedite vector b" << '\n';
-    for (int i = 0;i < size;i++)
-        cin >> b[i];
-    try {
-        slau<double> system(matrix, size);
-        Moevector<double> reshenie = system.gauss(b);
-        cout << "Reshenie sistemi: " << reshenie;
-    }
-    catch (exception e) { cout << "oshibka: " << e.what(); }
+     slau<double> system(matrix, size);
+     int choice;
+     while (true) {
+         cout << "\n1. Vvod pravoy chasti\n2. Vihod\n";
+         if (!(cin >> choice)) {
+             cout << "Oshibka: vvedite chislo!\n";
+             cin.clear();
+             while (cin.get() != '\n');
+             continue;
+         }
+         switch (choice) {
+         case 1: {
+             Moevector<double> b(size);
+             cout << "Vvedite b: ";
+             for (size_t i = 0; i < size; i++) cin >> b[i];
+             try {
+                 cout << "Reshenie: " << system.gauss(b) << "\n";
+             }
+             catch (const exception& e) {
+                 cout << "Oshibka: " << e.what() << "\n";
+             }
+             break;
+         }
+         case 2:
+             return 0;
+         default:
+             cout << "Nevernyy vybor\n";
+             while (cin.get() != '\n');
+         }
+     }
 }

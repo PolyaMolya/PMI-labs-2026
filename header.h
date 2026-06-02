@@ -5,7 +5,7 @@
 using namespace std;
 template <typename T>
 class Moevector {
-private:
+protected:
 	size_t size;
 	T* infa;
 public:
@@ -35,12 +35,6 @@ public:
 		}
 	}
 	~Moevector() { delete[] infa; };
-	friend ostream& operator<<(ostream& os, const Moevector& v) {
-		os << "Razmer: " << v.size << '\n' << "Vector: ";
-		for (int i = 0;i < v.size;i++)
-			os << v.infa[i] << ' ';
-		return os;
-	}
 	Moevector& operator=(const Moevector& other) {
 		size = other.size;
 		delete[] infa;
@@ -49,22 +43,26 @@ public:
 			infa[i] = other.infa[i];
 		return (*this);
 	}
-	Moevector& operator -=(const Moevector& lhs) {
-		for (int i = 0;i < size;i++)
+	Moevector& operator-=(const Moevector& lhs) {
+		if (size != lhs.size) {
+			throw runtime_error("-= razniy razmer vectora");
+		}
+		for (size_t i = 0; i < size; i++)
 			infa[i] -= lhs.infa[i];
 		return *this;
 	}
-	friend Moevector operator *(T mnozh, Moevector hh) {
-		Moevector result(hh.size);
-		for (int i = 0;i < hh.size;i++)
-			result.infa[i] = hh.infa[i] * mnozh;
+	Moevector operator*(T mnozh) {
+		Moevector result(size);
+		for (size_t i = 0; i < size; i++)
+			result.infa[i] = infa[i] * mnozh;
 		return result;
 	}
 	T& operator[](size_t index) {
 		if (index >= size)
-			cout << "Error index" <<'\n';
+			throw out_of_range("Index out of range in Moevector");
 		return infa[index];
 	}
+	friend ostream& operator<< <>(ostream& os, const Moevector<T>& v);
 	void swap(Moevector<T>& other) {
 		size_t temp = this->size;
 		this->size = other.size;
@@ -75,33 +73,35 @@ public:
 	}
 };
 template <typename T>
-class Moematrix {
+ostream& operator<<(ostream& os, const Moevector<T>& v) {
+	os << "Razmer: " << v.size << '\n' << "Vector: ";
+	for (int i = 0;i < v.size;i++)
+		os << v.infa[i] << ' ';
+	return os;
+}
+template <typename T>
+class Moematrix :public Moevector<Moevector<T>>{
 protected:
 	size_t msize;
-	Moevector<Moevector<T>> minfa;
 public:
-	Moematrix() {
+	Moematrix() : Moevector<Moevector<T>>() {
 		msize = 0;
 	}
-	Moematrix(size_t size) {
-		this->msize = size;
-		minfa = Moevector<Moevector<T>>(size);
+	Moematrix(size_t size) : Moevector<Moevector<T>>(size) {
+		msize = size;
 		for (size_t i = 0; i < size; i++) {
-			minfa[i] = Moevector<T>(size);
+			(*this)[i] = Moevector<T>(size);
 		}
 	}
-	Moematrix(size_t size, Moevector<Moevector<T>>& infa) {
+	Moematrix(size_t size, Moevector<Moevector<T>>& infa)
+		: Moevector<Moevector<T>>(infa) {
 		msize = size;
-		minfa = infa;
 	}
 	Moevector<T>& operator[](size_t index) {
-		return minfa[index];
-	}
-	friend ostream& operator<<(ostream& os, const Moematrix<T>& m) {
-		for (size_t i = 0; i < m.msize; i++) {
-			os << m.minfa[i] << '\n';
+		if (index >= msize) {
+			throw out_of_range("vihod za matritsu");
 		}
-		return os;
+		return Moevector<Moevector<T>>::operator[](index);
 	}
 };
 template <typename T>
@@ -116,31 +116,32 @@ public:
 	slau(Moevector<Moevector<T>> infa_, size_t size_):Moematrix<T>(size_, infa_) {}
 	Moevector<T> gauss(Moevector<T> b) {
 		size_t size = this->msize;
+		Moevector<Moevector<T>> A = *this;
 		Moevector<T> reshenie=Moevector<T>(size);
 		for (size_t i = 0;i < size;i++) {
 			size_t maxrow = i;
 			for (size_t k = i + 1;k < size;k++) {
-				if (abs((*this)[k][i]) > abs((*this)[maxrow][i]))
+				if (abs(A[k][i]) > abs(A[maxrow][i]))
 					maxrow = k;
 			}
 			if (maxrow != i) {
-				(*this)[i].swap((*this)[maxrow]);
+				A[i].swap(A[maxrow]);
 				bswap(b[i], b[maxrow]);
 			}
-			if (abs((*this)[i][i]) ==0) {
+			if (abs(A[i][i]) ==0) {
 				throw runtime_error("Matritsa virozhdena");
 			}
 			for (size_t j = i + 1;j < size;j++) {
-				T mnozh = (*this)[j][i] / (*this)[i][i];
-				(*this)[j] -= mnozh * (*this)[i];
+				T mnozh = A[j][i] / A[i][i];
+				A[j] -= A[i] * mnozh;
 				b[j] -= mnozh * b[i];
 			}
 		}
 			for (int i = int(size) - 1;i >= 0;i--) {
 				T sum = 0;
 				for (size_t j = i + 1;j < size;j++)
-					sum += (*this)[i][j] * reshenie[j];
-				reshenie[i] = (b[i] - sum) / (*this)[i][i];
+					sum += A[i][j] * reshenie[j];
+				reshenie[i] = (b[i] - sum) / A[i][i];
 			}
 			return reshenie;
 		}
