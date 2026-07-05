@@ -49,9 +49,4 @@ ___
 [Ссылка](https://docs.google.com/spreadsheets/d/1rphaJz6tOYf0mnpAGA0ZfFxf6KP3cbNjkdVERsYdK3s/edit?usp=sharing) на таблицу с баллами.  
 #### Разбалловка  
 
-| БАЛЛЫ | ОЦЕНКА |
-|----------------|:---------:|
-| 0 - 200 | неуд |
-| 201 - 320 | удовл |
-| 321 - 368 | хор |
-| 369 - 400 | отл |
+TODO
