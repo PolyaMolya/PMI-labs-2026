@@ -49,4 +49,4 @@ ___
 [Ссылка](https://docs.google.com/spreadsheets/d/1rphaJz6tOYf0mnpAGA0ZfFxf6KP3cbNjkdVERsYdK3s/edit?usp=sharing) на таблицу с баллами.  
 #### Разбалловка  
 
-TODO
+не буду делать пока
